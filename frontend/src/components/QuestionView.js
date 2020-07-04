@@ -150,7 +150,6 @@ class QuestionView extends Component {
             {this.createPagination()}
           </div>
         </div>
-
       </div>
     );
   }
