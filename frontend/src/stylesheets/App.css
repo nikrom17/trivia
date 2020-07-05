@@ -17,6 +17,10 @@
   font-size: large;
 }
 
+.category {
+  cursor: pointer;
+}
+
 h2 {
   text-align: center;
 }
