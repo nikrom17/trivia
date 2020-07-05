@@ -1,6 +1,7 @@
 import os
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 from flask_cors import CORS
 import random
 
@@ -41,7 +42,7 @@ def create_app(test_config=None):
     def categories():
         selection = Category.query.all()
         categories = {category.id: category.format()
-                      for category in selection_category}
+                      for category in selection}
         return jsonify({'categories': categories})
 
     '''
@@ -121,7 +122,7 @@ def create_app(test_config=None):
         finally:
             db.session.close()
             return jsonify({
-                'current_category': 'Sports',
+                'current_category': 'Sports',  # todo what should I return here?
             })
 
     '''
@@ -134,7 +135,13 @@ def create_app(test_config=None):
   only question that include that string within their question.
   Try using the word "title" to start.
   '''
-
+    @app.route('/questions/search',  methods=['GET, POST'])
+    def search_questions():
+        search_term = request.get_json()
+        print(search_term)
+        search_results = Question.query.filter(
+            func.lower(Question.question).like(func.lower(search_term)))
+        print(search_results)
     '''
   @TODO:
   Create a GET endpoint to get questions based on category.
