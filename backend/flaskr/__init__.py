@@ -38,7 +38,7 @@ def create_app(test_config=None):
   for all available categories.
   '''
 
-    @app.route('/categories')
+    @app.route('/categories', methods=["GET"])
     def categories():
         selection = Category.query.all()
         categories = {category.id: category.format()
@@ -58,7 +58,7 @@ def create_app(test_config=None):
   Clicking on the page numbers should update the questions.
   '''
 
-    @app.route('/questions')
+    @app.route('/questions', methods=['GET'])
     def questions():
         selection_question = Question.query.all()
         selection_category = Category.query.all()
@@ -113,10 +113,13 @@ def create_app(test_config=None):
     @app.route('/questions/create',  methods=['GET', 'POST'])
     def create_question():
         try:
-            question = request.get_json()
-            print(question)
+            new_question = request.get_json()
+            question = Question(new_question['question'], new_question['answer'],
+                                new_question['category'], new_question['difficulty'])
+            db.session.add(question)
             db.session.commit()
         except Exception as e:
+            print(e)
             errorFlag = True
             db.session.rollback()
         finally:
