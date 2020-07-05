@@ -138,13 +138,30 @@ def create_app(test_config=None):
   only question that include that string within their question.
   Try using the word "title" to start.
   '''
-    @app.route('/questions/search',  methods=['GET, POST'])
+    @app.route('/questions/search', methods=['GET', 'POST'])
     def search_questions():
-        search_term = request.get_json()
-        print(search_term)
-        search_results = Question.query.filter(
-            func.lower(Question.question).like(func.lower(search_term)))
-        print(search_results)
+        try:
+            response = request.get_json()
+            search_term_raw = response['searchTerm']
+            search_term = "%{}%".format(search_term_raw)
+            print(search_term)
+            search_results = Question.query.filter(
+                func.lower(Question.question).like(func.lower(search_term))).all()
+            print(search_results)
+            questions = [question.format() for question in search_results]
+            print(questions)
+        except Exception as e:
+            print(e)
+            errorFlag = True
+            db.session.rollback()
+        finally:
+            db.session.close()
+            return jsonify({
+                'questions': questions,
+                'total_questions': len(questions),
+                # 'categories': categories,
+                'current_category': 'Sports',
+            })
     '''
   @TODO:
   Create a GET endpoint to get questions based on category.
