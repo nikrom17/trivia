@@ -202,6 +202,29 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not.
   '''
+    @app.route('/quizzes', methods=['GET', 'POST'])
+    def play_trivia():
+        try:
+            response = request.get_json()
+            quiz_category = response.get('quiz_category')
+            previous_questions = response.get('previous_questions')
+            print(quiz_category, previous_questions)
+            if quiz_category['id']:
+                query = Question.query.filter(Question.category == quiz_category.id).filter(
+                    ~Question.id.in_(previous_questions))
+            else:
+                query = Question.query.filter(
+                    ~Question.id.in_(previous_questions))
+            query_results = query.all()
+            questions = [question.format() for question in query_results]
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+        finally:
+            db.session.close()
+            return jsonify({
+                'question': questions.pop(),
+            })
 
     '''
   @TODO:
