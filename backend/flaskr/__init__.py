@@ -210,20 +210,25 @@ def create_app(test_config=None):
             previous_questions = response.get('previous_questions')
             print(quiz_category, previous_questions)
             if quiz_category['id']:
-                query = Question.query.filter(Question.category == quiz_category.id).filter(
+                query = Question.query.filter(Question.category == quiz_category['id']).filter(
                     ~Question.id.in_(previous_questions))
             else:
                 query = Question.query.filter(
                     ~Question.id.in_(previous_questions))
             query_results = query.all()
             questions = [question.format() for question in query_results]
+            print(questions)
+            if len(questions):
+                question = questions.pop()
+            else:
+                question = False
         except Exception as e:
             print(e)
             db.session.rollback()
         finally:
             db.session.close()
             return jsonify({
-                'question': questions.pop(),
+                'question': question,
             })
 
     '''
