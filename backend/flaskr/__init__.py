@@ -159,7 +159,6 @@ def create_app(test_config=None):
             return jsonify({
                 'questions': questions,
                 'total_questions': len(questions),
-                # 'categories': categories,
                 'current_category': 'Sports',
             })
     '''
@@ -187,7 +186,6 @@ def create_app(test_config=None):
             return jsonify({
                 'questions': questions,
                 'total_questions': len(questions),
-                # 'categories': categories,
                 'current_category': category.type,
             })
 
@@ -208,7 +206,6 @@ def create_app(test_config=None):
             response = request.get_json()
             quiz_category = response.get('quiz_category')
             previous_questions = response.get('previous_questions')
-            print(quiz_category, previous_questions)
             if quiz_category['id']:
                 query = Question.query.filter(Question.category == quiz_category['id']).filter(
                     ~Question.id.in_(previous_questions))
@@ -217,7 +214,6 @@ def create_app(test_config=None):
                     ~Question.id.in_(previous_questions))
             query_results = query.all()
             questions = [question.format() for question in query_results]
-            print(questions)
             if len(questions):
                 question = questions.pop()
             else:
@@ -236,5 +232,21 @@ def create_app(test_config=None):
   Create error handlers for all expected errors
   including 404 and 422.
   '''
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            "success": False,
+            "error": 404,
+            "message": "Not found"
+        }), 404
+
+    @app.errorhandler(422)
+    def not_found(error):
+        return jsonify({
+            "success": False,
+            "error": 422,
+            "message": "Unprocessable entity"
+        }), 422
 
     return app
