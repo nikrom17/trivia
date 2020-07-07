@@ -18,7 +18,7 @@ def create_app(test_config=None):
     '''
   @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
   '''
-    cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+    cors = CORS(app, resources={r'/api/*': {'origins': '*'}})
 
     '''
   @TODO: Use the after_request decorator to set Access-Control-Allow
@@ -38,12 +38,15 @@ def create_app(test_config=None):
   for all available categories.
   '''
 
-    @app.route('/categories', methods=["GET"])
+    @app.route('/categories', methods=['GET'])
     def categories():
         selection = Category.query.all()
         categories = {category.id: category.format()
                       for category in selection}
-        return jsonify({'categories': categories})
+        return jsonify({
+            'success': True,
+            'categories': categories
+        })
 
     '''
   @TODO:
@@ -66,6 +69,7 @@ def create_app(test_config=None):
         categories = {category.id: category.format()
                       for category in selection_category}
         return jsonify({
+            'success': True,
             'questions': questions,
             'total_questions': len(questions),
             'categories': categories,
@@ -79,7 +83,7 @@ def create_app(test_config=None):
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page.
   '''
-    @app.route('/questions/<question_id>/delete',  methods=['GET', 'DELETE'])
+    @app.route('/questions/<int:question_id>/delete',  methods=['GET', 'DELETE'])
     def delete_question(question_id):
         try:
             question = Question.query.filter_by(id=question_id).delete()
@@ -94,6 +98,7 @@ def create_app(test_config=None):
         finally:
             db.session.close()
             return jsonify({
+                'success': True,
                 'questions': questions,
                 'total_questions': len(questions),
                 'categories': categories,
@@ -106,9 +111,9 @@ def create_app(test_config=None):
   which will require the question and answer text,
   category, and difficulty score.
 
-  TEST: When you submit a question on the "Add" tab,
+  TEST: When you submit a question on the 'Add' tab,
   the form will clear and the question will appear at the end of the last page
-  of the questions list in the "List" tab.
+  of the questions list in the 'List' tab.
   '''
     @app.route('/questions/create',  methods=['GET', 'POST'])
     def create_question():
@@ -125,6 +130,7 @@ def create_app(test_config=None):
         finally:
             db.session.close()
             return jsonify({
+                'success': True,
                 'current_category': 'Sports',  # todo what should I return here?
             })
 
@@ -136,20 +142,17 @@ def create_app(test_config=None):
 
   TEST: Search by any phrase. The questions list will update to include
   only question that include that string within their question.
-  Try using the word "title" to start.
+  Try using the word 'title' to start.
   '''
     @app.route('/questions/search', methods=['GET', 'POST'])
     def search_questions():
         try:
             response = request.get_json()
             search_term_raw = response['searchTerm']
-            search_term = "%{}%".format(search_term_raw)
-            print(search_term)
+            search_term = '%{}%'.format(search_term_raw)
             search_results = Question.query.filter(
                 func.lower(Question.question).like(func.lower(search_term))).all()
-            print(search_results)
             questions = [question.format() for question in search_results]
-            print(questions)
         except Exception as e:
             print(e)
             errorFlag = True
@@ -157,6 +160,7 @@ def create_app(test_config=None):
         finally:
             db.session.close()
             return jsonify({
+                'success': True,
                 'questions': questions,
                 'total_questions': len(questions),
                 'current_category': 'Sports',
@@ -165,7 +169,7 @@ def create_app(test_config=None):
   @TODO:
   Create a GET endpoint to get questions based on category.
 
-  TEST: In the "List" tab / main screen, clicking on one of the
+  TEST: In the 'List' tab / main screen, clicking on one of the
   categories in the left column will cause only questions of that
   category to be shown.
   '''
@@ -196,7 +200,7 @@ def create_app(test_config=None):
   and return a random questions within the given category,
   if provided, and that is not one of the previous questions.
 
-  TEST: In the "Play" tab, after a user selects "All" or a category,
+  TEST: In the 'Play' tab, after a user selects 'All' or a category,
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not.
   '''
@@ -224,6 +228,7 @@ def create_app(test_config=None):
         finally:
             db.session.close()
             return jsonify({
+                'success': True,
                 'question': question,
             })
 
@@ -236,17 +241,17 @@ def create_app(test_config=None):
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({
-            "success": False,
-            "error": 404,
-            "message": "Not found"
+            'success': False,
+            'error': 404,
+            'message': 'Not found'
         }), 404
 
     @app.errorhandler(422)
     def not_found(error):
         return jsonify({
-            "success": False,
-            "error": 422,
-            "message": "Unprocessable entity"
+            'success': False,
+            'code': 422,
+            'message': 'Unprocessable entity'
         }), 422
 
     return app
