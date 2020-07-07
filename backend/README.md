@@ -79,6 +79,8 @@ GET 'questions'
 DELETE '/questions/<int:question_id>/delete'
 POST '/questions/create'
 POST '/questions/search'
+GET '/categories/<int:category_id>/questions'
+POST '/quizzes/next-question'
 
 GET '/categories'
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
@@ -104,6 +106,9 @@ DELETE '/questions/<int:question_id>/delete'
 - Deletes the question corresponding to the question_id from the database
 - Request Arguments: <int:question_id>
 - Returns: The update '/questions' response with the corresponding question deleted
+{questions: <array>,
+  totalQuestions: <int>
+  currentCategory: <string>}
 
 POST '/questions/create'
 - Posts a new question to the trivia game
@@ -116,7 +121,27 @@ category: <string>}
 POST '/questions/search'
 - Fetches the questions that match the search term
 - Request Arguments: search_term: <string:search_term>
-- Returns: The updated '/questions' response with questions that match
+- Returns: The updated '/questions' response with questions that match the search term
+{questions: <array>,
+  totalQuestions: <int>
+  currentCategory: <string>}
+
+GET '/categories/<int:category_id>/questions'
+- Fetches all the questions for the specified category
+- Request Arguments: <int:category_id>
+- Returns: The updated '/questions' response with questions that have the core
+{questions: <array>,
+  totalQuestions: <int>
+  currentCategory: <string>}
+
+POST '/quizzes/next-question'
+- Fetches the next question when playing the trivia game
+- Request Arguments: {
+  quiz_category: <int>,
+  previous_questions: <array>
+}
+- Returns: The question object
+{ question: <object> }
 ```
 
 ## Testing

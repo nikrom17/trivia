@@ -178,7 +178,7 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that
   category to be shown.
   '''
-    @app.route('/categories/<int:category_id>/questions', methods=['GET', 'POST'])
+    @app.route('/categories/<int:category_id>/questions', methods=['GET'])
     def questions_by_category(category_id):
         try:
             query_results = Question.query.filter(
@@ -209,7 +209,7 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not.
   '''
-    @app.route('/quizzes', methods=['GET', 'POST'])
+    @app.route('/quizzes/next-question', methods=['GET', 'POST'])
     def play_trivia():
         try:
             response = request.get_json()
