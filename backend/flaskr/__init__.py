@@ -64,6 +64,9 @@ def create_app(test_config=None):
 
     @app.route('/questions', methods=['GET'])
     def questions():
+        page = request.args.get('page', 1, type=int)
+        start = (page - 1) * 10
+        end = start + 10
         selection_question = Question.query.all()
         selection_category = Category.query.all()
         questions = [question.format() for question in selection_question]
@@ -72,7 +75,7 @@ def create_app(test_config=None):
         return jsonify({
             'success': True,
             'code': 200,
-            'questions': questions,
+            'questions': questions[start:end],
             'total_questions': len(questions),
             'categories': categories,
             'current_category': 'Sports',
