@@ -78,7 +78,7 @@ def create_app(test_config=None):
             'questions': questions[start:end],
             'total_questions': len(questions),
             'categories': categories,
-            'current_category': 'Sports',
+            'current_category': None,
         })
 
     '''
@@ -91,10 +91,14 @@ def create_app(test_config=None):
     @app.route('/questions/<int:question_id>/delete',  methods=['GET', 'DELETE'])
     def delete_question(question_id):
         try:
-            question = Question.query.filter_by(id=question_id).delete()
-            selection_question = Question.query.all()
-            questions = [question.format() for question in selection_question]
-            db.session.commit()
+            if Question.query.get(question_id):
+                question = Question.query.filter_by(id=question_id).delete()
+                selection_question = Question.query.all()
+                questions = [question.format()
+                             for question in selection_question]
+                db.session.commit()
+            else:
+                abort(404)
         except Exception as e:
             errorFlag = True
             db.session.rollback()
@@ -193,8 +197,8 @@ def create_app(test_config=None):
         finally:
             db.session.close()
             return jsonify({
-                'success': False,
-                'code': 400,
+                'success': True,
+                'code': 200,
                 'questions': questions,
                 'total_questions': len(questions),
                 'current_category': category.type,
