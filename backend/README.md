@@ -68,11 +68,9 @@ One note before you delve into your tasks: for each endpoint you are expected to
 8. Create a POST endpoint to get questions to play the quiz. This endpoint should take category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions.
 9. Create error handlers for all expected errors including 400, 404, 422 and 500.
 
-REVIEW_COMMENT
+API Docs
 
 ```
-This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code.
-
 Endpoints
 GET '/categories'
 GET 'questions'
@@ -86,53 +84,65 @@ GET '/categories'
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
 - Request Arguments: None
 - Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs.
-{'1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
-'6' : "Sports"}
+{
+  '1' : "Science",
+  '2' : "Art",
+  '3' : "Geography",
+  '4' : "History",
+  '5' : "Entertainment",
+  '6' : "Sports"
+}
 
 GET '/questions'
 - Fetches the questions for the trivia game. Results are paginated with a limit of 10 questions.
 - Request Arguments: page (int)
 - Returns: An object with the following keys:
-{questions: <array>,
+{
+  questions: <array>,
   totalQuestions: <int>
   categories: <object>
-  currentCategory: <string>}
+  currentCategory: <string>
+ }
 
 DELETE '/questions/<int:question_id>/delete'
 - Deletes the question corresponding to the question_id from the database
 - Request Arguments: <int:question_id>
 - Returns: The update '/questions' response with the corresponding question deleted
-{questions: <array>,
+{
+  questions: <array>,
   totalQuestions: <int>
-  currentCategory: <string>}
+  currentCategory: <string>
+}
 
 POST '/questions/create'
 - Posts a new question to the trivia game
 - Request Arguments:
-{question: <string>,
-answer: <string>,
-difficulty: <int: 1 - 5>,
-category: <string>}
+{
+  question: <string>,
+  answer: <string>,
+  difficulty: <int: 1 - 5>,
+  category: <string>
+}
 
 POST '/questions/search'
 - Fetches the questions that match the search term
 - Request Arguments: search_term: <string:search_term>
 - Returns: The updated '/questions' response with questions that match the search term
-{questions: <array>,
+{
+  questions: <array>,
   totalQuestions: <int>
-  currentCategory: <string>}
+  currentCategory: <string>
+}
 
 GET '/categories/<int:category_id>/questions'
 - Fetches all the questions for the specified category
 - Request Arguments: <int:category_id>
 - Returns: The updated '/questions' response with questions that have the core
-{questions: <array>,
+{
+  questions: <array>,
   totalQuestions: <int>
-  currentCategory: <string>}
+  currentCategory: <string>
+}
 
 POST '/quizzes/next-question'
 - Fetches the next question when playing the trivia game
@@ -141,7 +151,9 @@ POST '/quizzes/next-question'
   previous_questions: <array>
 }
 - Returns: The question object
-{ question: <object> }
+{
+  question: <object>
+}
 ```
 
 ## Testing
