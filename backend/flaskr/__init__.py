@@ -244,6 +244,14 @@ def create_app(test_config=None):
   including 404 and 422.
   '''
 
+    @app.errorhandler(400)
+    def not_found(error):
+        return jsonify({
+            'success': False,
+            'code': 400,
+            'message': 'Bad Request'
+        }), 400
+
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({
@@ -259,5 +267,13 @@ def create_app(test_config=None):
             'code': 422,
             'message': 'Unprocessable entity'
         }), 422
+
+    @app.errorhandler(500)
+    def not_found(error):
+        return jsonify({
+            'success': False,
+            'code': 500,
+            'message': 'Server error'
+        }), 500
 
     return app
