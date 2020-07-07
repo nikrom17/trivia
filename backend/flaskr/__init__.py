@@ -45,6 +45,7 @@ def create_app(test_config=None):
                       for category in selection}
         return jsonify({
             'success': True,
+            'code': 200,
             'categories': categories
         })
 
@@ -70,6 +71,7 @@ def create_app(test_config=None):
                       for category in selection_category}
         return jsonify({
             'success': True,
+            'code': 200,
             'questions': questions,
             'total_questions': len(questions),
             'categories': categories,
@@ -99,6 +101,7 @@ def create_app(test_config=None):
             db.session.close()
             return jsonify({
                 'success': True,
+                'code': 200,
                 'questions': questions,
                 'total_questions': len(questions),
                 'categories': categories,
@@ -131,6 +134,7 @@ def create_app(test_config=None):
             db.session.close()
             return jsonify({
                 'success': True,
+                'code': 200,
                 'current_category': 'Sports',  # todo what should I return here?
             })
 
@@ -161,6 +165,7 @@ def create_app(test_config=None):
             db.session.close()
             return jsonify({
                 'success': True,
+                'code': 200,
                 'questions': questions,
                 'total_questions': len(questions),
                 'current_category': 'Sports',
@@ -229,6 +234,7 @@ def create_app(test_config=None):
             db.session.close()
             return jsonify({
                 'success': True,
+                'code': 200,
                 'question': question,
             })
 
@@ -242,7 +248,7 @@ def create_app(test_config=None):
     def not_found(error):
         return jsonify({
             'success': False,
-            'error': 404,
+            'code': 404,
             'message': 'Not found'
         }), 404
 
