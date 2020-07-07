@@ -43,6 +43,50 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['categories'])
 
+    def test_get_questions(self):
+        res = self.client().get('/questions?page=1')
+        data = json.loads(res.data)
+
+        self.assertEqual(data['code'], 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['questions'])
+        self.assertEqual(data['total_questions'], 19)
+        self.assertEqual(data['current_category'], None)
+
+    def test_delete_question(self):
+        res = self.client().get('/questions/1/delete')
+        data = json.loads(res.data)
+
+        self.assertEqual(data['code'], 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['questions'])
+        self.assertEqual(data['total_questions'], 18)
+
+    def test_search_questions(self):
+        res = self.client().get('/questions/search',
+                                json={'search_term': 'title'})
+        data = json.loads(res.data)
+
+        self.assertEqual(data['code'], 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['questions'])
+
+    def test_get_questions_by_category(self):
+        res = self.client().get('/categories/1/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(data['code'], 200)
+        self.assertEqual(data['success'], True)
+        # self.assertTrue(data['categories'])
+
+    def test_get_quiz_next_questions(self):
+        res = self.client().get('/quizzes/next-question')
+        data = json.loads(res.data)
+
+        self.assertEqual(data['code'], 200)
+        self.assertEqual(data['success'], True)
+        # self.assertTrue(data['categories'])
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

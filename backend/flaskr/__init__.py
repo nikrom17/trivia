@@ -93,9 +93,7 @@ def create_app(test_config=None):
         try:
             question = Question.query.filter_by(id=question_id).delete()
             selection_question = Question.query.all()
-            selection_category = Category.query.all()
             questions = [question.format() for question in selection_question]
-            categories = [category.format() for category in selection_category]
             db.session.commit()
         except Exception as e:
             errorFlag = True
@@ -107,7 +105,6 @@ def create_app(test_config=None):
                 'code': 200,
                 'questions': questions,
                 'total_questions': len(questions),
-                'categories': categories,
                 'current_category': 'Sports',
             })
 
@@ -138,7 +135,7 @@ def create_app(test_config=None):
             return jsonify({
                 'success': True,
                 'code': 200,
-                'current_category': 'Sports',  # todo what should I return here?
+                'current_category': None,
             })
 
     '''
@@ -171,7 +168,7 @@ def create_app(test_config=None):
                 'code': 200,
                 'questions': questions,
                 'total_questions': len(questions),
-                'current_category': 'Sports',
+                'current_category': None,
             })
     '''
   @TODO:
@@ -196,6 +193,8 @@ def create_app(test_config=None):
         finally:
             db.session.close()
             return jsonify({
+                'success': False,
+                'code': 400,
                 'questions': questions,
                 'total_questions': len(questions),
                 'current_category': category.type,
