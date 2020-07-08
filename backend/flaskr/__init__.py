@@ -102,7 +102,7 @@ def create_app(test_config=None):
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page.
   '''
-    @app.route('/questions/<int:question_id>/delete',  methods=['GET', 'DELETE'])
+    @app.route('/questions/<int:question_id>/delete',  methods=['DELETE'])
     def delete_question(question_id):
         try:
             if Question.query.get(question_id):
@@ -136,7 +136,7 @@ def create_app(test_config=None):
   the form will clear and the question will appear at the end of the last page
   of the questions list in the 'List' tab.
   '''
-    @app.route('/questions/create',  methods=['GET', 'POST'])
+    @app.route('/questions/create',  methods=['POST'])
     def create_question():
         try:
             new_question = request.get_json()
@@ -166,7 +166,7 @@ def create_app(test_config=None):
   only question that include that string within their question.
   Try using the word 'title' to start.
   '''
-    @app.route('/questions/search', methods=['GET', 'POST'])
+    @app.route('/questions/search', methods=['POST'])
     def search_questions():
         try:
             response = request.get_json()

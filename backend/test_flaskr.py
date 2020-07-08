@@ -56,7 +56,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['categories'])
 
     def test_create_question(self):
-        res = self.client().get('/questions/create', json={
+        res = self.client().post('/questions/create', json={
             'question': '2 + 2 = ?', 'answer': '4', 'category': 1, 'difficulty': 1
         })
         data = json.loads(res.data)
@@ -66,8 +66,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['current_category'], None)
 
     def test_search_questions(self):
-        res = self.client().get('/questions/search',
-                                json={'searchTerm': 'title'})
+        res = self.client().post('/questions/search',
+                                 json={'searchTerm': 'title'})
         data = json.loads(res.data)
 
         self.assertEqual(data['code'], 200)
@@ -94,7 +94,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['question'])
 
     def test_delete_question(self):
-        res = self.client().get('/questions/10/delete')
+        res = self.client().delete('/questions/10/delete')
         data = json.loads(res.data)
 
         self.assertEqual(data['code'], 200)
@@ -112,8 +112,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['message'], "Unprocessable entity")
 
     def test_invalid_search_params(self):
-        res = self.client().get('/questions/search',
-                                json={'search_term': 'title'})
+        res = self.client().post('/questions/search',
+                                 json={'search_term': 'title'})
         data = json.loads(res.data)
 
         self.assertEqual(data['code'], 500)
@@ -129,7 +129,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['message'], "Not found")
 
     def test_invalid_question_create_object(self):
-        res = self.client().get('/questions/create', json={
+        res = self.client().post('/questions/create', json={
             'question': '2 + 2 = ?', 'answers': '4', 'category': 1, 'difficulty': 1
         })
         data = json.loads(res.data)
