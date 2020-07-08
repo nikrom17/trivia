@@ -40,14 +40,21 @@ def create_app(test_config=None):
 
     @app.route('/categories', methods=['GET'])
     def categories():
-        selection = Category.query.all()
-        categories = {category.id: category.format()
-                      for category in selection}
-        return jsonify({
-            'success': True,
-            'code': 200,
-            'categories': categories
-        })
+        try:
+            selection = Category.query.all()
+            categories = {category.id: category.format()
+                          for category in selection}
+            return jsonify({
+                'success': True,
+                'code': 200,
+                'categories': categories
+            })
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            abort(500)
+        finally:
+            db.session.close()
 
     '''
   @TODO:
@@ -64,22 +71,29 @@ def create_app(test_config=None):
 
     @app.route('/questions', methods=['GET'])
     def questions():
-        page = request.args.get('page', 1, type=int)
-        start = (page - 1) * 10
-        end = start + 10
-        selection_question = Question.query.all()
-        selection_category = Category.query.all()
-        questions = [question.format() for question in selection_question]
-        categories = {category.id: category.format()
-                      for category in selection_category}
-        return jsonify({
-            'success': True,
-            'code': 200,
-            'questions': questions[start:end],
-            'total_questions': len(questions),
-            'categories': categories,
-            'current_category': None,
-        })
+        try:
+            page = request.args.get('page', 1, type=int)
+            start = (page - 1) * 10
+            end = start + 10
+            selection_question = Question.query.all()
+            selection_category = Category.query.all()
+            questions = [question.format() for question in selection_question]
+            categories = {category.id: category.format()
+                          for category in selection_category}
+            return jsonify({
+                'success': True,
+                'code': 200,
+                'questions': questions[start:end],
+                'total_questions': len(questions),
+                'categories': categories,
+                'current_category': None,
+            })
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            abort(500)
+        finally:
+            db.session.close()
 
     '''
   @TODO:
@@ -99,18 +113,18 @@ def create_app(test_config=None):
                 db.session.commit()
             else:
                 abort(404)
-        except Exception as e:
-            errorFlag = True
-            db.session.rollback()
-        finally:
-            db.session.close()
             return jsonify({
                 'success': True,
                 'code': 200,
                 'questions': questions,
                 'total_questions': len(questions),
-                'current_category': 'Sports',
             })
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            abort(500)
+        finally:
+            db.session.close()
 
     '''
   @TODO:
@@ -130,17 +144,17 @@ def create_app(test_config=None):
                                 new_question['category'], new_question['difficulty'])
             db.session.add(question)
             db.session.commit()
-        except Exception as e:
-            print(e)
-            errorFlag = True
-            db.session.rollback()
-        finally:
-            db.session.close()
             return jsonify({
                 'success': True,
                 'code': 200,
                 'current_category': None,
             })
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            abort(500)
+        finally:
+            db.session.close()
 
     '''
   @TODO:
@@ -161,12 +175,6 @@ def create_app(test_config=None):
             search_results = Question.query.filter(
                 func.lower(Question.question).like(func.lower(search_term))).all()
             questions = [question.format() for question in search_results]
-        except Exception as e:
-            print(e)
-            errorFlag = True
-            db.session.rollback()
-        finally:
-            db.session.close()
             return jsonify({
                 'success': True,
                 'code': 200,
@@ -174,6 +182,12 @@ def create_app(test_config=None):
                 'total_questions': len(questions),
                 'current_category': None,
             })
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            abort(500)
+        finally:
+            db.session.close()
     '''
   @TODO:
   Create a GET endpoint to get questions based on category.
@@ -189,13 +203,6 @@ def create_app(test_config=None):
                 Question.category == category_id).all()
             questions = [question.format() for question in query_results]
             category = Category.query.get(category_id)
-
-        except Exception as e:
-            print(e)
-            errorFlag = True
-            db.session.rollback()
-        finally:
-            db.session.close()
             return jsonify({
                 'success': True,
                 'code': 200,
@@ -203,6 +210,11 @@ def create_app(test_config=None):
                 'total_questions': len(questions),
                 'current_category': category.type,
             })
+        except Exception as e:
+            db.session.rollback()
+            abort(500)
+        finally:
+            db.session.close()
 
     '''
   @TODO:
@@ -221,6 +233,8 @@ def create_app(test_config=None):
             response = request.get_json()
             quiz_category = response.get('quiz_category')
             previous_questions = response.get('previous_questions')
+            if 'id' not in quiz_category or 'type' not in quiz_category or type(previous_questions) != list:
+                abort(400)
             if quiz_category['id']:
                 query = Question.query.filter(Question.category == quiz_category['id']).filter(
                     ~Question.id.in_(previous_questions))
@@ -233,16 +247,16 @@ def create_app(test_config=None):
                 question = questions.pop()
             else:
                 question = False
-        except Exception as e:
-            print(e)
-            db.session.rollback()
-        finally:
-            db.session.close()
             return jsonify({
                 'success': True,
                 'code': 200,
                 'question': question,
             })
+        except Exception as e:
+            db.session.rollback()
+            abort(500)
+        finally:
+            db.session.close()
 
     '''
   @TODO:
