@@ -55,6 +55,16 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['categories'])
 
+    def test_create_question(self):
+        res = self.client().get('/questions/create', json={
+            'question': '2 + 2 = ?', 'answer': '4', 'category': 1, 'difficulty': 1
+        })
+        data = json.loads(res.data)
+
+        self.assertEqual(data['code'], 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['current_category'], None)
+
     def test_search_questions(self):
         res = self.client().get('/questions/search',
                                 json={'searchTerm': 'title'})
@@ -75,8 +85,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['current_category'], 'Science')
 
     def test_get_quiz_next_questions(self):
-        res = self.client().get('/quizzes/next-question',
-                                json={'quiz_category': {'id': 1, 'type': 'Science'}, 'previous_questions': []})
+        res = self.client().post('/quizzes/next-question',
+                                 json={'quiz_category': {'id': 1, 'type': 'Science'}, 'previous_questions': []})
         data = json.loads(res.data)
 
         self.assertEqual(data['code'], 200)
@@ -91,6 +101,42 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['questions'])
         self.assertEqual(data['total_questions'], 18)
+
+    def test_invalid_category_object_for_quiz(self):
+        res = self.client().post('/quizzes/next-question',
+                                 json={'quiz_category': {'ids': 1, 'type': 'Science'}, 'previous_questions': []})
+        data = json.loads(res.data)
+
+        self.assertEqual(data['code'], 422)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], "Unprocessable entity")
+
+    def test_invalid_search_params(self):
+        res = self.client().get('/questions/search',
+                                json={'search_term': 'title'})
+        data = json.loads(res.data)
+
+        self.assertEqual(data['code'], 500)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], "Server error")
+
+    def test_invalid_category_id(self):
+        res = self.client().get('/categories/10/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(data['code'], 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], "Not found")
+
+    def test_invalid_question_create_object(self):
+        res = self.client().get('/questions/create', json={
+            'question': '2 + 2 = ?', 'answers': '4', 'category': 1, 'difficulty': 1
+        })
+        data = json.loads(res.data)
+
+        self.assertEqual(data['code'], 400)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], "Bad request")
 
 
 # Make the tests conveniently executable

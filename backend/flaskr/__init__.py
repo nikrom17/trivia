@@ -122,7 +122,7 @@ def create_app(test_config=None):
         except Exception as e:
             print(e)
             db.session.rollback()
-            abort(500)
+            abort(404)
         finally:
             db.session.close()
 
@@ -152,7 +152,7 @@ def create_app(test_config=None):
         except Exception as e:
             print(e)
             db.session.rollback()
-            abort(500)
+            abort(400)
         finally:
             db.session.close()
 
@@ -201,6 +201,8 @@ def create_app(test_config=None):
         try:
             query_results = Question.query.filter(
                 Question.category == category_id).all()
+            if not query_results:
+                abort(404)
             questions = [question.format() for question in query_results]
             category = Category.query.get(category_id)
             return jsonify({
@@ -211,8 +213,9 @@ def create_app(test_config=None):
                 'current_category': category.type,
             })
         except Exception as e:
+            print(e)
             db.session.rollback()
-            abort(500)
+            abort(404)
         finally:
             db.session.close()
 
@@ -227,14 +230,14 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not.
   '''
-    @app.route('/quizzes/next-question', methods=['GET', 'POST'])
+    @app.route('/quizzes/next-question', methods=['POST'])
     def play_trivia():
         try:
             response = request.get_json()
             quiz_category = response.get('quiz_category')
             previous_questions = response.get('previous_questions')
             if 'id' not in quiz_category or 'type' not in quiz_category or type(previous_questions) != list:
-                abort(400)
+                abort(422)
             if quiz_category['id']:
                 query = Question.query.filter(Question.category == quiz_category['id']).filter(
                     ~Question.id.in_(previous_questions))
@@ -253,8 +256,9 @@ def create_app(test_config=None):
                 'question': question,
             })
         except Exception as e:
+            print(e)
             db.session.rollback()
-            abort(500)
+            abort(422)
         finally:
             db.session.close()
 
@@ -265,11 +269,11 @@ def create_app(test_config=None):
   '''
 
     @app.errorhandler(400)
-    def not_found(error):
+    def bad_request(error):
         return jsonify({
             'success': False,
             'code': 400,
-            'message': 'Bad Request'
+            'message': 'Bad request'
         }), 400
 
     @app.errorhandler(404)
@@ -281,7 +285,7 @@ def create_app(test_config=None):
         }), 404
 
     @app.errorhandler(422)
-    def not_found(error):
+    def unprocessable_entity(error):
         return jsonify({
             'success': False,
             'code': 422,
@@ -289,7 +293,7 @@ def create_app(test_config=None):
         }), 422
 
     @app.errorhandler(500)
-    def not_found(error):
+    def server_error(error):
         return jsonify({
             'success': False,
             'code': 500,
